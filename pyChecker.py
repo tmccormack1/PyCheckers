@@ -47,6 +47,7 @@ class Checker:
         self.circ.setFill("Black")
         self.circ.draw(win)
         self.row = row
+        self.isKing = False
 
 class BlackTeam:
     radius = 20
@@ -240,31 +241,58 @@ def getRow(j_val):
         
     return row
     
+
+def checkSpot(validSpots, win):
+    
+    mouseClick = win.getMouse()     # get a mouse click and coordinates
+    x = mouseClick.getX()
+    y = mouseClick.getY()    
+    
+    #if j_val remains 1000 it means that the spot is invalid
+    j_val = 1000
+    
+    for j in range(len(validSpots)):
+        if(x > validSpots[j].x1 and x < validSpots[j].x2 ):                    #if your mouse click is in a valid spot
+            if( y < validSpots[j].y1 and y > validSpots[j].y2):                
+                print("YOU CLICKED ON SPOT: ", j)  
+                j_val = j
+
+    if(j_val == 1000):
+        initMessageBox(win, "INVALID")
+        return False, x, y
+    else:
+        return True, x, y
         
     
     
 def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOver):
     
     
-    rowPosition = 0
+    spotIsValid = False
+    
+    finalRow = 7
     
     print("Enter go()")
     
     goAhead = True
-    # get the mouse click
-    mouseClick = win.getMouse()     # get a mouse click and coordinates
-    x = mouseClick.getX()
-    y = mouseClick.getY()
+    
+    
+    while (spotIsValid == False):
+        spotIsValid, x, y = checkSpot(validSpots, win)
     
     m_val = 0
     j_val = 0
     
     
     activeSpots = []
+    kingPins    = []
     for e in range(len(realPieces)):
         activeSpots.append(realPieces[e].currentPosition)
+        if(realPieces[e].isKing == True):
+            kingPins.append(e)
     
     print (activeSpots)
+    print("HERE ARE THE KING PINS: ", kingPins)
     
     #for tomorrow Tam
     # if the turn is even then the update will be plus four
@@ -278,11 +306,17 @@ def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOv
                 print("YOU CLICKED ON SPOT: ", j)  
                 j_val = j
                 row = getRow(j_val)
+            
+                print ("ROW: ",row)
+                if(row == 2):
+                    print("KING")
+                    initMessageBox(win,"THAT PIECE IS A KING")
+                    
                 initMessageBox(win, row)
                 
              
     if(row % 2 == 1 ):   
-        if(j_val == 7 and (11 in activeSpots)):
+        if(j_val == 7 and (11 in activeSpots) or (j_val == 15 and (19 in activeSpots))  or (j_val == 23 and (27 in activeSpots))):
             initMessageBox(win, "INVALID: LOCKED IN")
             j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)                
                 
@@ -295,7 +329,18 @@ def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOv
             else:
                 initMessageBox(win,"INVALID ")
                 j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)
+    elif(row % 2 == 0):
+        print("EVEN")
+        if(j_val == 8 and (12 in activeSpots)):
+            print("YESSS")
+            initMessageBox(win, "INVALID")
+        else:
+            initMessageBox(win, "VALID")
+            
     
+    
+    
+        
     else:
         if(j_val in activeSpots):
             initMessageBox(win, "VALID")
@@ -374,6 +419,12 @@ def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOv
                         print("NEW POSITION: ", realPieces[k_val].currentPosition)
                     else:
                         initMessageBox(win,"ERROR DONT GO OFF THE BOARD") 
+                        
+    
+    if(row == (finalRow-1)):
+        print("KING")
+        initMessageBox(win,"THAT PIECE IS A KING") 
+        realPieces[k_val].isKing = True
                         
                         
                         
