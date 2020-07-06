@@ -220,10 +220,34 @@ def pickAValidDestination(validSpots, activeSpots, win, j_val):
             if(y_val < 300 or x_val > 450):
                 goAhead = False    
     
+def getRow(j_val):
+    if(j_val in (0,1,2,3)):
+        row = 0
+    elif(j_val in (4,5,6,7)):
+        row = 1
+    elif(j_val in (8,9,10,11)):
+        row = 2
+    elif(j_val in (12,13,14,15)):
+        row = 3
+    elif(j_val in (16,17,18,19)):
+        row = 4    
+    elif(j_val in (20,21,22,23)):
+        row = 5  
+    elif(j_val in (24,25,26,27)):
+        row = 6  
+    elif(j_val in (28,29,30,31)):
+        row = 7    
+        
+    return row
     
+        
     
     
 def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOver):
+    
+    
+    rowPosition = 0
+    
     print("Enter go()")
     
     goAhead = True
@@ -253,24 +277,34 @@ def go(win, validSpots, spotsWithChecks, realPieces, turns, pieceHistory, gameOv
             if( y < validSpots[j].y1 and y > validSpots[j].y2):                
                 print("YOU CLICKED ON SPOT: ", j)  
                 j_val = j
-             
-             
-    if(j_val == 7 and (11 in activeSpots)):
-        initMessageBox(win, "INVALID: LOCKED IN")
-        j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)                
+                row = getRow(j_val)
+                initMessageBox(win, row)
                 
-    elif((j_val in activeSpots) and ((j_val+5 not in activeSpots) or (j_val + 4 not in activeSpots))):
-        initMessageBox(win,"VALID")        
-    else:
-        if(j_val in (4,5,6,7)):
+             
+    if(row % 2 == 1 ):   
+        if(j_val == 7 and (11 in activeSpots)):
             initMessageBox(win, "INVALID: LOCKED IN")
-            j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)
+            j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)                
+                
+        elif((j_val in activeSpots) and ((j_val+5 not in activeSpots) or (j_val + 4 not in activeSpots))):
+            initMessageBox(win,"VALID")        
+        else:
+            if(j_val in (4,5,6,7) or j_val in (12,13,14,16) or j_val in (20,21,22,23)):
+                initMessageBox(win, "INVALID: LOCKED IN")
+                j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)
+            else:
+                initMessageBox(win,"INVALID ")
+                j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)
+    
+    else:
+        if(j_val in activeSpots):
+            initMessageBox(win, "VALID")
         else:
             initMessageBox(win,"INVALID ")
-            j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)
+            j_val, x, y = pickAValidSpot(validSpots, activeSpots, win)            
         
         
-    
+    #
     for k in range(len(realPieces)):
         if(j_val == realPieces[k].currentPosition):
             print("EUREKA", j_val, realPieces[k].currentPosition)
